@@ -21,7 +21,7 @@ import socket
 import fcntl
 import struct
 
-def get_ip_address(ifname='enp24s0f1'):
+def get_ip_address(ifname='enp129s0f0np0'):
     """Get the local IP address of the client from a specific interface."""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
@@ -38,7 +38,7 @@ def get_ip_address(ifname='enp24s0f1'):
         s.close()
 
 # Example usage
-interface_name = 'enp24s0f1'
+interface_name = 'enp129s0f0np0'
 ip_address = get_ip_address(interface_name)
 print(f"IP address of {interface_name}: {ip_address}")
 
