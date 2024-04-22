@@ -181,13 +181,13 @@ def main() -> None:
     # Load evaluation data
     _, testset = utils.load_cifar()
 
-    client_manager = SimpleClientManager()  # Assuming you have this class defined elsewhere
+    client_manager = SimpleClientManager()
     strategy = CustomFedAvg(
     fraction_fit=args.sample_fraction,
     min_fit_clients=args.min_sample_size,
     min_available_clients=args.min_num_clients,
     eval_fn=get_eval_fn(testset),
-    on_fit_config_fn=fit_config,)  # Make sure you pass the custom client manager here if your strategy requires it
+    on_fit_config_fn=fit_config,)
     server = fl.server.Server(client_manager=client_manager, strategy=strategy)
 
 
