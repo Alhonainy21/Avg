@@ -13,23 +13,11 @@ from torchvision.models import resnet50
 from torchvision.models import densenet121, mobilenet_v2
 from efficientnet_pytorch import EfficientNet
 
-DATA_ROOT = Path("/users/aga5h3")
+DATA_ROOT = Path("/users/aga5h3/colon")
 
 class Net(nn.Module):
     """Your custom Net class remains unchanged."""
     # Your Net class definition here...
-
-# def MobileNetV2():
-#     """Returns a MobileNetV2 model from TorchVision adapted for CIFAR-10."""
-#     # Load the pretrained MobileNetV2 model
-#     model = mobilenet_v2(pretrained=True)
-#     # Customize the first convolutional layer for CIFAR-10
-#     model.features[0][0] = torch.nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1, bias=False)
-#     nn.init.kaiming_normal_(model.features[0][0].weight, mode="fan_out", nonlinearity="relu")
-#     # Replace the final classifier layer to match the number of classes (2 for binary classification)
-#     num_features = model.classifier[1].in_features  # Get the number of input features for the original final layer
-#     model.classifier[1] = torch.nn.Linear(num_features, 3)
-#     return model
 
 
 def get_weights(self) -> fl.common.Weights:
@@ -70,7 +58,7 @@ def ResNet50():
 
 def DenseNet121():
     """Returns a DenseNet121 model from TorchVision adapted for CIFAR-10."""
-    model = densenet121(num_classes=10)
+    model = densenet121(num_classes=2)
 
     # replace w/ smaller input layer
     model.features.conv0 = torch.nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1, bias=False)
@@ -81,7 +69,7 @@ def DenseNet121():
 
 def MobileNetV2():
     """Returns a MobileNetV2 model from TorchVision adapted for CIFAR-10."""
-    model = mobilenet_v2(num_classes=10)
+    model = mobilenet_v2(num_classes=2)
 
     # replace w/ smaller input layer
     model.features[0][0] = torch.nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1, bias=False)
@@ -91,7 +79,7 @@ def MobileNetV2():
 
 def EfficientNetB0():
     """Returns an EfficientNetB0 model from efficientnet_pytorch adapted for CIFAR-10."""
-    model = EfficientNet.from_pretrained('efficientnet-b0', num_classes=3)
+    model = EfficientNet.from_pretrained('efficientnet-b0', num_classes=2)
 
     # replace w/ smaller input layer
     model._conv_stem = torch.nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1, bias=False)
@@ -116,28 +104,28 @@ def load_model(model_name: str) -> nn.Module:
         raise NotImplementedError(f"model {model_name} is not implemented")
 
 #     return trainset, testset
-def load_cifar(download=True) -> Tuple[datasets.CIFAR10, datasets.CIFAR10]:
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-    ])
+# def load_cifar(download=True) -> Tuple[datasets.CIFAR10, datasets.CIFAR10]:
+#     transform = transforms.Compose([
+#         transforms.ToTensor(),
+#         transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+#     ])
     
-    # Load the CIFAR-10 training dataset
-    training_set = datasets.CIFAR10(root=DATA_ROOT / "cifar-10", train=True, download=download, transform=transform)
+#     # Load the CIFAR-10 training dataset
+#     training_set = datasets.CIFAR10(root=DATA_ROOT / "cifar-10", train=True, download=download, transform=transform)
 
     
-    # Load the CIFAR-10 testing dataset
-    testing_set = datasets.CIFAR10(root=DATA_ROOT / "cifar-10", train=False, download=download, transform=transform)
+#     # Load the CIFAR-10 testing dataset
+#     testing_set = datasets.CIFAR10(root=DATA_ROOT / "cifar-10", train=False, download=download, transform=transform)
 
     
-    # Return the training and testing datasets without any class-based filtering
-    return training_set, testing_set
+#     # Return the training and testing datasets without any class-based filtering
+#     return training_set, testing_set
 
-# def load_cifar(download=False) -> Tuple[datasets.CIFAR10, datasets.CIFAR10]:
-#     transform = transforms.Compose([transforms.Resize((32,32)),transforms.ToTensor()])
-#     trainset = datasets.ImageFolder(DATA_ROOT/"train", transform=transform)
-#     testset = datasets.ImageFolder(DATA_ROOT/"test", transform=transform)
-#     return trainset, testset
+def load_cifar(download=False) -> Tuple[datasets.CIFAR10, datasets.CIFAR10]:
+    transform = transforms.Compose([transforms.Resize((32,32)),transforms.ToTensor()])
+    trainset = datasets.ImageFolder(DATA_ROOT/"train", transform=transform)
+    testset = datasets.ImageFolder(DATA_ROOT/"test", transform=transform)
+    return trainset, testset
 
 def train(
     net: Net,
