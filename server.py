@@ -88,7 +88,13 @@ def main() -> None:
     # Configure logger
     fl.common.logger.configure("server", host=args.log_host)
 
-
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
+    console.setFormatter(formatter)
+    logging.getLogger('').addHandler(console)
+    
     # Load evaluation data
     _, testset = utils.load_cifar()
     # Create client_manager, strategy, and server
