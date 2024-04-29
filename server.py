@@ -68,6 +68,7 @@ parser.add_argument(
 )
 parser.add_argument("--pin_memory", action="store_true")
 args = parser.parse_args()
+
 def _log_memory_usage(self):
     # Get memory usage
     memory = psutil.virtual_memory()
