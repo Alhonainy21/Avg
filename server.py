@@ -124,6 +124,7 @@ def fit_config(server_round: int) -> Dict[str, fl.common.Scalar]:
         "batch_size": str(args.batch_size),
         "num_workers": str(args.num_workers),
         "pin_memory": str(args.pin_memory),
+        "total_rounds": str(args.rounds),
     }
     return config
 
