@@ -58,7 +58,7 @@ def ResNet50():
 
 def DenseNet121():
     """Returns a DenseNet121 model from TorchVision adapted for CIFAR-10."""
-    model = densenet121(num_classes=2)
+    model = densenet121(num_classes=3)
 
     # replace w/ smaller input layer
     model.features.conv0 = torch.nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1, bias=False)
@@ -69,7 +69,7 @@ def DenseNet121():
 
 def MobileNetV2():
     """Returns a MobileNetV2 model from TorchVision adapted for CIFAR-10."""
-    model = mobilenet_v2(num_classes=2)
+    model = mobilenet_v2(num_classes=3)
 
     # replace w/ smaller input layer
     model.features[0][0] = torch.nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1, bias=False)
