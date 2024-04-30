@@ -13,7 +13,7 @@ from torchvision.models import resnet50
 from torchvision.models import densenet121, mobilenet_v2
 from efficientnet_pytorch import EfficientNet
 
-DATA_ROOT = Path("/users/aga5h3/colon")
+DATA_ROOT = Path("/lung_3_sub")
 
 class Net(nn.Module):
     """Your custom Net class remains unchanged."""
