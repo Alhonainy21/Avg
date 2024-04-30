@@ -6,6 +6,8 @@ import numpy as np
 import torch
 import torchvision
 import utils
+import logging
+import psutil
 
 # pylint: disable=no-member
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -69,16 +71,11 @@ parser.add_argument(
 parser.add_argument("--pin_memory", action="store_true")
 args = parser.parse_args()
 
-def _log_memory_usage(self):
-    # Get memory usage
+def _log_memory_usage():
     memory = psutil.virtual_memory()
     memory_usage_info = f"Memory Usage: {memory.percent}% used of {memory.total / (1024**3):.2f}GB"
-
-    # Log to file and print to console
     logging.info(memory_usage_info)
-    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
     print(memory_usage_info)
-    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
 
 def main() -> None:
@@ -118,6 +115,7 @@ def main() -> None:
 
 def fit_config(server_round: int) -> Dict[str, fl.common.Scalar]:
     """Return a configuration with static batch size and (local) epochs."""
+    _log_memory_usage()
     config = {
         "epoch_global": str(server_round),
         "epochs": str(3),
