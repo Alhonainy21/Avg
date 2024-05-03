@@ -45,7 +45,7 @@ class CustomFedAvg(FedAvg):
         memory_usage_info = f"Memory Usage: {memory.percent}% used of {memory.total / (1024**3):.2f}GB"
 
         # Log to file and print to console
-        logging.info(memory_usage_info)
+        #logging.info(memory_usage_info)
         print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
         print(memory_usage_info)
         print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
