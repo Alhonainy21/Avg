@@ -74,7 +74,7 @@ args = parser.parse_args()
 def _log_memory_usage():
     memory = psutil.virtual_memory()
     memory_usage_info = f"Memory Usage: {memory.percent}% used of {memory.total / (1024**3):.2f}GB"
-    logging.info(memory_usage_info)
+    # logging.info(memory_usage_info)
     print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
     print(memory_usage_info)
     print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
