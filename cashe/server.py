@@ -93,8 +93,6 @@ class CustomFedAvg(FedAvg):
             num_layers = len(all_weights[0])
             aggregated_weights = [sum([weights[layer] for weights in all_weights]) / total_data_points for layer in range(num_layers)]
             aggregated_parameters = weights_to_parameters(aggregated_weights)
-        
-        self._log_memory_usage()
 
         return aggregated_parameters if aggregated_weights else None, {}
 
@@ -201,6 +199,8 @@ def main() -> None:
 
 def fit_config(server_round: int) -> Dict[str, fl.common.Scalar]:
     """Return a configuration with static batch size and (local) epochs."""
+    custom_fed_avg_instance = CustomFedAvg()                                                                                                                              
+    custom_fed_avg_instance._log_memory_usage()
     config = {
         "epoch_global": str(server_round),
         "epochs": str(3),
