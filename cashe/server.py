@@ -40,16 +40,17 @@ class CustomFedAvg(FedAvg):
         return client_ip
 
     def _log_memory_usage(self):
+        # Get memory usage
         memory = psutil.virtual_memory()
-        used_gb = memory.used / (1024 ** 3)  # Convert bytes to gigabytes
-        total_gb = memory.total / (1024 ** 3)  # Convert bytes to gigabytes
-        print("=========================================================")
-        print(f"Memory Usage: {memory.percent}% used of {total_gb:.2f}GB (Used: {used_gb:.2f} GB)")
-        print("=========================================================")
+        memory_usage_info = f"Memory Usage: {memory.percent}% used of {memory.total / (1024**3):.2f}GB"
+
+        # Log to file and print to console
+        #logging.info(memory_usage_info)
+        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+        print(memory_usage_info)
+        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
     def aggregate_fit(self, rnd: int, results: List[Tuple[ClientProxy, FitRes]], failures):
-        print(f"Memory before round {rnd}:")
-        self._log_memory_usage()
         aggregated_weights = None
         total_data_points = 0
         all_weights = []
@@ -92,9 +93,6 @@ class CustomFedAvg(FedAvg):
             num_layers = len(all_weights[0])
             aggregated_weights = [sum([weights[layer] for weights in all_weights]) / total_data_points for layer in range(num_layers)]
             aggregated_parameters = weights_to_parameters(aggregated_weights)
-
-        print(f"Memory after round {rnd}:")
-        self._log_memory_usage()
 
         return aggregated_parameters if aggregated_weights else None, {}
 
