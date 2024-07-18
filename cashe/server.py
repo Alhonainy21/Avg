@@ -25,84 +25,14 @@ from flwr.server.client_proxy import ClientProxy
 import psutil
 import logging
 
-# class CustomFedAvg(FedAvg):
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         self.client_id_mapping = {}
-#         self.client_ip_mapping = {}
-#         self.last_update_cache = {}
-#         self.next_client_id = 1
-#         self.last_num_data_points = {}
-
-#     def _get_client_ip(self, fit_res):
-#         # Extract the client's IP address from the fit results' metrics
-#         client_ip = fit_res.metrics.get("client_ip", "Unknown IP")
-#         return client_ip
-
-#     def _log_memory_usage(self):
-#         memory = psutil.virtual_memory()
-#         used_gb = memory.used / (1024 ** 3)  # Convert bytes to gigabytes
-#         total_gb = memory.total / (1024 ** 3)  # Convert bytes to gigabytes
-#         print("=========================================================")
-#         print(f"Memory Usage: {memory.percent}% used of {total_gb:.2f}GB (Used: {used_gb:.2f} GB)")
-#         print("=========================================================")
-
-#     def aggregate_fit(self, rnd: int, results: List[Tuple[ClientProxy, FitRes]], failures):
-#         print(f"Memory before round {rnd}:")
-#         self._log_memory_usage()
-#         aggregated_weights = None
-#         total_data_points = 0
-#         all_weights = []
-
-#         for client_proxy, fit_res in results:
-#             client_id = client_proxy.cid
-#             # Initialize client if not seen before
-#             if client_id not in self.client_id_mapping:
-#                 self.client_id_mapping[client_id] = self.next_client_id
-#                 self.next_client_id += 1
-#             unique_id = self.client_id_mapping[client_id]
-
-#             client_ip = self._get_client_ip(fit_res)
-
-#             # Determine whether to use direct update or cached weights
-#             if fit_res.parameters.tensors:
-#                 # Direct update from client
-#                 weights = parameters_to_weights(fit_res.parameters)
-#                 print(f"Round {rnd}, Client {unique_id}: with IP {client_ip} using direct update from client.")
-#             elif unique_id in self.last_update_cache:
-#                 # Use cached weights if direct update is empty
-#                 weights = parameters_to_weights(self.last_update_cache[unique_id])
-#                 print(f"Round {rnd}, Client {unique_id}: with IP {client_ip} using cached weights.")
-#             else:
-#                 # Skip this client if no direct update or cached weights are available
-#                 print(f"Round {rnd}, Client {unique_id}: No update available.")
-#                 continue
-
-#             # Update cache with the latest successful update
-#             self.last_update_cache[unique_id] = fit_res.parameters
-#             self.last_num_data_points[unique_id] = fit_res.num_examples
-
-#             # Prepare for aggregation
-#             weighted_weights = [np.array(w) * fit_res.num_examples for w in weights]
-#             all_weights.append(weighted_weights)
-#             total_data_points += fit_res.num_examples
-
-#         # Aggregate weights if any are collected
-#         if all_weights:
-#             num_layers = len(all_weights[0])
-#             aggregated_weights = [sum([weights[layer] for weights in all_weights]) / total_data_points for layer in range(num_layers)]
-#             aggregated_parameters = weights_to_parameters(aggregated_weights)
-        
-#         print(f"Memory after round {rnd}:")
-#         self._log_memory_usage()
-
 class CustomFedAvg(FedAvg):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.client_id_mapping = {}
         self.client_ip_mapping = {}
-        self.aggregated_weights_cache = None  # Cache for aggregated weights
+        self.last_update_cache = {}
         self.next_client_id = 1
+        self.last_num_data_points = {}
 
     def _get_client_ip(self, fit_res):
         # Extract the client's IP address from the fit results' metrics
@@ -120,6 +50,7 @@ class CustomFedAvg(FedAvg):
     def aggregate_fit(self, rnd: int, results: List[Tuple[ClientProxy, FitRes]], failures):
         print(f"Memory before round {rnd}:")
         self._log_memory_usage()
+        aggregated_weights = None
         total_data_points = 0
         all_weights = []
 
@@ -133,18 +64,23 @@ class CustomFedAvg(FedAvg):
 
             client_ip = self._get_client_ip(fit_res)
 
-            # Use the received weights if available
+            # Determine whether to use direct update or cached weights
             if fit_res.parameters.tensors:
+                # Direct update from client
                 weights = parameters_to_weights(fit_res.parameters)
                 print(f"Round {rnd}, Client {unique_id}: with IP {client_ip} using direct update from client.")
-            elif self.aggregated_weights_cache:
-                # Use cached aggregated weights if no direct update is available
-                weights = parameters_to_weights(self.aggregated_weights_cache)
-                print(f"Round {rnd}, Client {unique_id}: with IP {client_ip} using cached aggregated weights.")
+            elif unique_id in self.last_update_cache:
+                # Use cached weights if direct update is empty
+                weights = parameters_to_weights(self.last_update_cache[unique_id])
+                print(f"Round {rnd}, Client {unique_id}: with IP {client_ip} using cached weights.")
             else:
-                # Skip this client if no updates or cached weights are available
+                # Skip this client if no direct update or cached weights are available
                 print(f"Round {rnd}, Client {unique_id}: No update available.")
                 continue
+
+            # Update cache with the latest successful update
+            self.last_update_cache[unique_id] = fit_res.parameters
+            self.last_num_data_points[unique_id] = fit_res.num_examples
 
             # Prepare for aggregation
             weighted_weights = [np.array(w) * fit_res.num_examples for w in weights]
@@ -155,14 +91,13 @@ class CustomFedAvg(FedAvg):
         if all_weights:
             num_layers = len(all_weights[0])
             aggregated_weights = [sum([weights[layer] for weights in all_weights]) / total_data_points for layer in range(num_layers)]
-            self.aggregated_weights_cache = weights_to_parameters(aggregated_weights)  # Update the cache with aggregated weights
+            aggregated_parameters = weights_to_parameters(aggregated_weights)
         
         print(f"Memory after round {rnd}:")
         self._log_memory_usage()
 
-        return self.aggregated_weights_cache if self.aggregated_weights_cache else None, {}
 
-# Main function and other parts remain unchanged
+        return aggregated_parameters if aggregated_weights else None, {}
 
 
 
