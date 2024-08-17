@@ -42,9 +42,9 @@ class CustomFedAvg(FedAvg):
         memory = psutil.virtual_memory()
         used_gb = memory.used / (1024 ** 3)  # Convert bytes to gigabytes
         total_gb = memory.total / (1024 ** 3)  # Convert bytes to gigabytes
-        print("=========================================================")
+        print("==========================================================")
         print(f"Memory Usage: {memory.percent}% used of {total_gb:.2f}GB (Used: {used_gb:.2f} GB)")
-        print("=========================================================")
+        print("==========================================================")
 
     def aggregate_fit(self, rnd: int, results: List[Tuple[ClientProxy, FitRes]], failures):
         print(f"Memory before round {rnd}:")
